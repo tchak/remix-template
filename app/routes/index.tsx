@@ -2,7 +2,8 @@ import type { MetaFunction, LoaderFunction } from 'remix';
 import { Link, useLoaderData } from 'remix';
 import { SkipNavContent } from '@reach/skip-nav';
 
-import { authenticator, User } from '~/util/auth.server';
+import type { User } from '~/models/user';
+import { authenticator } from '~/util/auth.server';
 
 export const meta: MetaFunction = () => ({ title: 'Remix Template' });
 export const handle = { hydrate: true };

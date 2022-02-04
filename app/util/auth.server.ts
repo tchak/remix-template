@@ -10,8 +10,11 @@ import type { SessionStorage } from 'remix';
 
 import { sessionStorage } from './session.server';
 import { getEnv } from '.';
-
-export type User = { id: string; name: string };
+import {
+  User,
+  findOrCreateByGithubId,
+  findOrCreateByTwitterId,
+} from '~/models/user';
 
 export const authenticator = new Authenticator<User>(sessionStorage);
 
@@ -25,12 +28,7 @@ authenticator.use(
         'http://localhost:3000/auth/github/callback'
       ),
     },
-    async ({ profile }) => {
-      return {
-        id: profile.id,
-        name: profile.displayName,
-      };
-    }
+    ({ profile }) => findOrCreateByGithubId(profile.id, profile.displayName)
   )
 );
 
@@ -44,43 +42,28 @@ authenticator.use(
         'http://localhost:3000/auth/twitter/callback'
       ),
     },
-    async ({ profile }) => {
-      return {
-        id: String(profile.id),
-        name: profile.name,
-      };
-    }
+    ({ profile }) => findOrCreateByTwitterId(String(profile.id), profile.name)
   )
 );
 
-if (process.env.NODE_ENV != 'production') {
-  class DevStrategy<User> extends Strategy<User, void> {
-    name = 'dev';
+class DevStrategy<User> extends Strategy<User, void> {
+  name = 'dev';
 
-    constructor(verify: StrategyVerifyCallback<User, void>) {
-      super(verify);
-    }
-
-    async authenticate(
-      request: Request,
-      sessionStorage: SessionStorage,
-      options: AuthenticateOptions
-    ): Promise<User> {
-      return this.success(
-        await this.verify(),
-        request,
-        sessionStorage,
-        options
-      );
-    }
+  constructor(verify: StrategyVerifyCallback<User, void>) {
+    super(verify);
   }
 
+  async authenticate(
+    request: Request,
+    sessionStorage: SessionStorage,
+    options: AuthenticateOptions
+  ): Promise<User> {
+    return this.success(await this.verify(), request, sessionStorage, options);
+  }
+}
+
+if (process.env.NODE_ENV != 'production') {
   authenticator.use(
-    new DevStrategy(async () => {
-      return {
-        id: 'dev',
-        name: 'Test User',
-      };
-    })
+    new DevStrategy(() => findOrCreateByTwitterId('dev', 'Test User'))
   );
 }
