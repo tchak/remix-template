@@ -3,7 +3,7 @@ import type { LoaderFunction } from 'remix';
 import { authenticator } from '~/util/auth.server';
 
 export const loader: LoaderFunction = ({ request }) =>
-  authenticator.authenticate('github', request, {
+  authenticator.authenticate('twitter', request, {
     successRedirect: '/',
-    failureRedirect: '/',
+    failureRedirect: '/signin',
   });
