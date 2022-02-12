@@ -1,47 +1,72 @@
-import type { MetaFunction, LoaderFunction } from 'remix';
+import type { MetaFunction, LoaderFunction, ActionFunction } from 'remix';
 import { useTransition, Form, useLoaderData } from 'remix';
-import { SkipNavContent } from '@reach/skip-nav';
 
 import { authenticator } from '~/util/auth.server';
+import { sessionStorage } from '~/util/session.server';
+import { Button } from '~/components/Button';
 
 export const meta: MetaFunction = () => ({ title: 'Sign In' });
 export const handle = { hydrate: true };
 export const loader: LoaderFunction = async ({ request }) => {
   await authenticator.isAuthenticated(request, { successRedirect: '/' });
-  const actions = [
-    { name: 'GitHub', action: '/auth/github' },
-    { name: 'Twitter', action: '/auth/twitter' },
-  ];
-  if (process.env.NODE_ENV != 'production') {
-    actions.push({ name: 'Dev', action: '/auth/dev' });
-  }
-  return actions;
+  const session = await sessionStorage.getSession(
+    request.headers.get('cookie')
+  );
+  return {
+    magicLinkSent: session.has('auth:magiclink'),
+    error: session.get('auth:error'),
+  };
+};
+export const action: ActionFunction = async ({ request }) => {
+  await authenticator.authenticate('email-link', request, {
+    successRedirect: '/signin',
+    failureRedirect: '/signin',
+  });
 };
 
 export default function SignInRoute() {
   const transition = useTransition();
-  const actions = useLoaderData<{ name: string; action: string }[]>();
-  const isConnecting = (action: string) =>
-    transition.type == 'actionSubmission' &&
-    transition.location.pathname == action;
+  const { magicLinkSent, error } =
+    useLoaderData<{ magicLinkSent: boolean; error?: string }>();
+  const isSigningIn = transition.type == 'actionSubmission';
 
   return (
-    <div>
-      <h1 className="py-6">Sign In</h1>
-      <SkipNavContent />
-      {actions.map(({ name, action }) => (
-        <Form action={action} method="post" replace className="mb-2">
-          <button
-            type="submit"
-            disabled={isConnecting(action)}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            {isConnecting(action)
-              ? `Connecting with ${name}...`
-              : `Continue with ${name}`}
-          </button>
-        </Form>
-      ))}
+    <div className="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Sign in to your account
+        </h1>
+      </div>
+
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          {magicLinkSent ? (
+            <p>Magic link sent! Check your email.</p>
+          ) : (
+            <Form
+              action="/signin"
+              method="post"
+              aria-labelledby="signin"
+              replace
+              noValidate
+              className="space-y-6"
+            >
+              <input
+                placeholder="Email"
+                name="email"
+                type="email"
+                required
+                disabled={isSigningIn}
+              />
+              <div>
+                <Button type="submit" primary className="w-full justify-center">
+                  {isSigningIn ? 'Signing in...' : 'Sign in'}
+                </Button>
+              </div>
+            </Form>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

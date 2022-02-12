@@ -2,7 +2,7 @@ import type { MetaFunction, LoaderFunction } from 'remix';
 import { Link, useLoaderData } from 'remix';
 import { SkipNavContent } from '@reach/skip-nav';
 
-import type { User } from '~/models/user';
+import type { Schema } from '~/models/user';
 import { authenticator } from '~/util/auth.server';
 
 export const meta: MetaFunction = () => ({ title: 'Remix Template' });
@@ -11,13 +11,13 @@ export const loader: LoaderFunction = ({ request }) =>
   authenticator.isAuthenticated(request, { failureRedirect: '/signin' });
 
 export default function IndexRoute() {
-  const user = useLoaderData<User>();
+  const user = useLoaderData<Schema>();
   return (
     <div>
       <h1 className="py-6">Remix Template</h1>
       <SkipNavContent />
 
-      <p className="mb-4 text-base">Hello {user.name}</p>
+      <p className="mb-4 text-base">Hello {user.email}</p>
 
       <Link
         to="/signout"
