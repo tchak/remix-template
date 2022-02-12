@@ -1,9 +1,10 @@
 import type { MetaFunction, LoaderFunction } from 'remix';
-import { Link, useLoaderData } from 'remix';
+import { useLoaderData } from 'remix';
 import { SkipNavContent } from '@reach/skip-nav';
 
 import type { Schema } from '~/models/user';
 import { authenticator } from '~/util/auth.server';
+import { LinkButton } from '~/components/Button';
 
 export const meta: MetaFunction = () => ({ title: 'Remix Template' });
 export const handle = { hydrate: true };
@@ -19,12 +20,7 @@ export default function IndexRoute() {
 
       <p className="mb-4 text-base">Hello {user.email}</p>
 
-      <Link
-        to="/signout"
-        className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-      >
-        Sign Out
-      </Link>
+      <LinkButton to="/signout">Sign Out</LinkButton>
     </div>
   );
 }
