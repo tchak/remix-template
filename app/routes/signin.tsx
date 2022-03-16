@@ -26,7 +26,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function SignInRoute() {
   const transition = useTransition();
-  const { magicLinkSent, error } =
+  const { magicLinkSent } =
     useLoaderData<{ magicLinkSent: boolean; error?: string }>();
   const isSigningIn = transition.type == 'actionSubmission';
 
