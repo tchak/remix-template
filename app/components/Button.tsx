@@ -84,6 +84,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return button;
   }
 );
+Button.displayName = 'Button';
 
 export type LinkButtonProps = LinkProps & ButtonClassNameProps;
 
@@ -115,3 +116,5 @@ export const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
     return link;
   }
 );
+
+LinkButton.displayName = 'LinkButton';
