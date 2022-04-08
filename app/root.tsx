@@ -9,8 +9,6 @@ import {
   useMatches,
 } from 'remix';
 import type { LinksFunction, ThrownResponse, MetaFunction } from 'remix';
-import type { ReactNode } from 'react';
-import { SkipNavLink } from '@reach/skip-nav';
 
 import tailwind from '~/styles/tailwind.css';
 
@@ -21,10 +19,6 @@ export const meta: MetaFunction = () => ({
 
 export const links: LinksFunction = () => {
   return [
-    {
-      rel: 'stylesheet',
-      href: 'https://unpkg.com/@reach/skip-nav@0.16.0/styles.css',
-    },
     { rel: 'stylesheet', href: tailwind },
     {
       rel: 'apple-touch-icon',
@@ -78,12 +72,10 @@ function Document({
   children,
   title,
   lang = 'en',
-  skipNavLink = true,
 }: {
   children: React.ReactNode;
   title?: string;
   lang?: string;
-  skipNavLink?: boolean;
 }) {
   const matches = useMatches();
   const includeScripts = matches.some((match) => match.handle?.hydrate);
@@ -98,13 +90,10 @@ function Document({
         <Links />
       </head>
       <body>
-        {skipNavLink ? (
-          <SkipNavLink className="rounded-md underline shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500" />
-        ) : null}
-        <Layout>{children}</Layout>
+        {children}
         <ScrollRestoration />
         {includeScripts ? <Scripts /> : null}
-        {process.env.NODE_ENV == 'development' && <LiveReload />}
+        <LiveReload />
       </body>
     </html>
   );
@@ -112,7 +101,7 @@ function Document({
 
 function ErrorMessage({ title, message }: { title: string; message: string }) {
   return (
-    <Document title={title} skipNavLink={false}>
+    <Document title={title}>
       <div>
         <h1 className="py-6">{title}</h1>
         <p>{message}</p>
@@ -130,15 +119,4 @@ function caughtMessage(caught: ThrownResponse) {
     default:
       throw new Error(caught.data || caught.statusText);
   }
-}
-
-function Layout({ children }: { children: ReactNode }) {
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto text-xl">
-        <main>{children}</main>
-        <footer className="my-8 text-xs flex flex-col-reverse items-start md:items-center md:flex-row md:justify-between"></footer>
-      </div>
-    </div>
-  );
 }
