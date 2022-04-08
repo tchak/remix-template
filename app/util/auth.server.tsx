@@ -1,5 +1,6 @@
 import { Authenticator } from 'remix-auth';
-import { EmailLinkStrategy, SendEmailOptions } from 'remix-auth-email-link';
+import { EmailLinkStrategy } from 'remix-auth-email-link';
+import type { SendEmailOptions } from 'remix-auth-email-link';
 import { renderToString } from 'react-dom/server';
 import { z } from 'zod';
 

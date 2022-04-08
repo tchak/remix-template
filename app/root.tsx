@@ -9,7 +9,7 @@ import {
   useMatches,
 } from 'remix';
 import type { LinksFunction, ThrownResponse, MetaFunction } from 'remix';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { SkipNavLink } from '@reach/skip-nav';
 
 import tailwind from '~/styles/tailwind.css';

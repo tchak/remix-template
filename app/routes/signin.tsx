@@ -26,8 +26,10 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function SignInRoute() {
   const transition = useTransition();
-  const { magicLinkSent } =
-    useLoaderData<{ magicLinkSent: boolean; error?: string }>();
+  const { magicLinkSent } = useLoaderData<{
+    magicLinkSent: boolean;
+    error?: string;
+  }>();
   const isSigningIn = transition.type == 'actionSubmission';
 
   return (
@@ -52,6 +54,7 @@ export default function SignInRoute() {
               className="space-y-6"
             >
               <input
+                className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                 placeholder="Email"
                 name="email"
                 type="email"

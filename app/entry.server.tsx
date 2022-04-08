@@ -1,7 +1,13 @@
-import { StrictMode } from 'react';
-import { renderToString } from 'react-dom/server';
+import { PassThrough } from 'stream';
+// @ts-expect-error
+import { renderToPipeableStream } from 'react-dom/server';
 import { RemixServer } from 'remix';
 import type { EntryContext } from 'remix';
+import { Response } from '@remix-run/node';
+import type { Headers } from '@remix-run/node';
+import isbot from 'isbot';
+
+const ABORT_DELAY = 5000;
 
 export default function handleRequest(
   request: Request,
@@ -9,16 +15,35 @@ export default function handleRequest(
   responseHeaders: Headers,
   remixContext: EntryContext
 ) {
-  const markup = renderToString(
-    <StrictMode>
-      <RemixServer context={remixContext} url={request.url} />
-    </StrictMode>
-  );
+  const callbackName = isbot(request.headers.get('user-agent'))
+    ? 'onAllReady'
+    : 'onShellReady';
 
-  responseHeaders.set('content-type', 'text/html');
+  return new Promise((resolve) => {
+    let didError = false;
 
-  return new Response('<!DOCTYPE html>' + markup, {
-    status: responseStatusCode,
-    headers: responseHeaders,
+    const { pipe, abort } = renderToPipeableStream(
+      <RemixServer context={remixContext} url={request.url} />,
+      {
+        [callbackName]() {
+          let body = new PassThrough();
+
+          responseHeaders.set('Content-Type', 'text/html');
+
+          resolve(
+            new Response(body, {
+              status: didError ? 500 : responseStatusCode,
+              headers: responseHeaders,
+            })
+          );
+          pipe(body);
+        },
+        onError(error: Error) {
+          didError = true;
+          console.error(error);
+        },
+      }
+    );
+    setTimeout(abort, ABORT_DELAY);
   });
 }

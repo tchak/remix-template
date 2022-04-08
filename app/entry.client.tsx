@@ -1,16 +1,10 @@
-import React, { StrictMode } from 'react';
-import ReactDOM from 'react-dom';
+import { StrictMode } from 'react';
+import { hydrateRoot } from 'react-dom/client';
 import { RemixBrowser } from 'remix';
 
-if (process.env.NODE_ENV !== 'production') {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const axe = require('@axe-core/react');
-  axe(React, ReactDOM, 1000);
-}
-
-ReactDOM.hydrate(
+hydrateRoot(
+  document,
   <StrictMode>
     <RemixBrowser />
-  </StrictMode>,
-  document
+  </StrictMode>
 );

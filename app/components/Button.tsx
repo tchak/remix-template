@@ -1,6 +1,7 @@
 import type { ComponentPropsWithRef } from 'react';
 import { forwardRef } from 'react';
-import { Link, LinkProps } from 'remix';
+import { Link } from 'remix';
+import type { LinkProps } from 'remix';
 import clsx from 'clsx';
 import { Tooltip } from '@reach/tooltip';
 
