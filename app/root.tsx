@@ -7,8 +7,9 @@ import {
   ScrollRestoration,
   useCatch,
   useMatches,
-} from 'remix';
-import type { LinksFunction, ThrownResponse, MetaFunction } from 'remix';
+} from '@remix-run/react';
+import type { LinksFunction, MetaFunction } from '@remix-run/node';
+import type { ThrownResponse } from '@remix-run/react';
 
 import tailwind from '~/styles/tailwind.css';
 

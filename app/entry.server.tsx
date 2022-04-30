@@ -1,11 +1,9 @@
 import { PassThrough } from 'stream';
-// @ts-expect-error
 import { renderToPipeableStream } from 'react-dom/server';
-import { RemixServer } from 'remix';
-import type { EntryContext } from 'remix';
+import { RemixServer } from '@remix-run/react';
 import { Response } from '@remix-run/node';
-import type { Headers } from '@remix-run/node';
 import isbot from 'isbot';
+import type { Headers, EntryContext } from '@remix-run/node';
 
 const ABORT_DELAY = 5000;
 
@@ -26,9 +24,9 @@ export default function handleRequest(
       <RemixServer context={remixContext} url={request.url} />,
       {
         [callbackName]() {
-          let body = new PassThrough();
+          const body = new PassThrough();
 
-          responseHeaders.set('Content-Type', 'text/html');
+          responseHeaders.set('content-type', 'text/html');
 
           resolve(
             new Response(body, {
@@ -38,7 +36,7 @@ export default function handleRequest(
           );
           pipe(body);
         },
-        onError(error: Error) {
+        onError(error) {
           didError = true;
           console.error(error);
         },

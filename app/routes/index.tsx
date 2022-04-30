@@ -1,4 +1,4 @@
-import type { MetaFunction } from 'remix';
+import type { MetaFunction } from '@remix-run/node';
 
 export const meta: MetaFunction = () => ({ title: 'Remix Template' });
 export const handle = { hydrate: true };
